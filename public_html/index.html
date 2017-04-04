@@ -8,11 +8,13 @@
          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
          <script type="text/javascript">
              $( document ).ready( function(){
+                 var url = "http://localhost/dev/Modpack-Webservice/public";
+                 
                  //Get allowed repositories via REST Service
                  $.ajax({
                      type:      "GET",
-                     url:       "http://localhost/dev/Modpack-Webservice/public/repository",
-                     success: function( response ) {
+                     url:       url + "/repository",
+                     success    : function( response ) {
                          $.each( response._embedded.repository, function( index, value ) {
                              $( "#repository" ).append( "<option value=\"" + value.token + "\">" + value.name + "</option>");
                          });
@@ -23,7 +25,7 @@
                  $( "#form" ).on( "submit", function(){
                     $.ajax({
                         type:   "POST",
-                        url:    "http://localhost/dev/Modpack-Webservice/public/issue",
+                        url:    url + "/issue",
                         data:   {
                             repository  : $( "#repository" ).val(),
                             name        : $( "#author" ).val(),
