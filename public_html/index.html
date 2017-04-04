@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Modpack-Webclient - Example</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+         <script type="text/javascript">
+             $( document ).ready( function(){
+                 //Get allowed repositories via REST Service
+                 $.ajax({
+                     type:      "GET",
+                     url:       "http://localhost/dev/Modpack-Webservice/public/repository",
+                     success: function( response ) {
+                         $.each( response._embedded.repository, function( index, value ) {
+                             $( "#repository" ).append( "<option value=\"" + value.token + "\">" + value.name + "</option>");
+                         });
+                     }
+                 });
+                 
+                 //Post issue via REST Service
+                 $( "#form" ).on( "submit", function(){
+                    $.ajax({
+                        type:   "POST",
+                        url:    "http://localhost/dev/Modpack-Webservice/public/issue",
+                        data:   {
+                            repository  : $( "#repository" ).val(),
+                            name        : $( "#author" ).val(),
+                            title       : $( "#title" ).val(),
+                            description : $( "#text").val()
+                        },
+                        contentType : "application/json",
+                        dataType    : "json",
+                        success     : function( response ) {
+                            console.log( response );
+                        },
+                        failure     : function( response )
+                        {
+                            console.log( response );
+                        }
+                    });
+                    
+                    //Supress form submit
+                    return false;
+                 });
+             });
+         </script>
+    </head>
+    <body>
+        <div class="container">
+            <p id="messages" class="" role="alert"></p>
+            <form id="form" method="POST">
+                <fieldset>
+                    <legend>Repository</legend>
+                    <select class="form-control" id="repository" name="repository"></select>
+                </fieldset>
+                <fieldset>
+                    <legend>Issue</legend>
+                    <div class="form-group">
+                        <label for="author">Author:</label>
+                        <input type="text" class="form-control" id="author" name="author" placeholder="Your nickname..." />
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Issue title..." />
+                    </div>
+                    <div class="form-group">
+                        <label for="text">Text:</label>
+                        <textarea id="text" class="form-control" rows="10" name="text" placeholder="Explain your problem..."></textarea>
+                        <p class="help-block">Which information needed for a helpful issue report...</p>
+                    </div>
+                </fieldset>
+                <button type="submit" id="submit" class="btn btn-default">Create Issue</button>
+            </form>
+        </div>
+    </body>
+</html>
