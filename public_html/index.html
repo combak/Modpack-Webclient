@@ -23,23 +23,52 @@
                  
                  //Post issue via REST Service
                  $( "#form" ).on( "submit", function(){
+                    $( "#messages" ).empty();
+                    $( "#messages" ).attr( "class", "" );
                     $.ajax({
                         type:   "POST",
                         url:    url + "/issue",
-                        data:   {
-                            repository  : $( "#repository" ).val(),
-                            name        : $( "#author" ).val(),
-                            title       : $( "#title" ).val(),
-                            description : $( "#text").val()
-                        },
+                        data:   JSON.stringify({
+                            "repository"  : $( "#repository" ).val(),
+                            "name"        : $( "#author" ).val(),
+                            "title"       : $( "#title" ).val(),
+                            "description" : $( "#text").val()
+                        }),
                         contentType : "application/json",
                         dataType    : "json",
-                        success     : function( response ) {
-                            console.log( response );
-                        },
-                        failure     : function( response )
+                        success     : function( response ) 
                         {
                             console.log( response );
+                            
+                            $( "#messages" ).attr( "class", "alert alert-success" );
+                            $( "#messages" ).append( "Issue created.")
+                        },
+                        error : function( response )
+                        {
+                            console.log( response );
+                            $( "#messages" ).attr( "class", "alert alert-warning" );
+                            
+                            switch( response.status )
+                            {
+                                case 422 :
+                                    $( "#messages" ).append( "<ul>" );
+                                    $.each( response.responseJSON.validation_messages, function( index, value ){
+                                        $.each( value, function( i, value ) {
+                                            $( "#messages" ).append( "<li>" + index + ": " + value + "</li>" );
+                                        });
+                                    });
+                                    $( "#messages" ).append( "</ul>" );
+                                    break;
+                                default :
+                                    $( "#messages" ).append( "Something went wrong." );
+                                    break;
+                            }
+                        },
+                        failure : function( response )
+                        {
+                            console.log( response );
+                            $( "#messages" ).attr( "class", "alert alert-danger" );
+                            $( "#messages" ).append( "Something terribly went wrong.")
                         }
                     });
                     
